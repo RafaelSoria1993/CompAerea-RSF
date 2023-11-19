@@ -1,0 +1,81 @@
+CREATE DATABASE IF NOT EXISTS COMPAÑIA_AEREA;
+USE COMPAÑIA_AEREA;
+
+create table T_CAT_PROFESIONAL(
+    Cod_categoria tinyint PRIMARY KEY,
+    Nombre varchar(30) NOT NULL  
+);
+
+create table T_PERSONAL(
+    Id_trabajador int PRIMARY KEY,
+    Cod_categoria tinyint,
+    Nombre varchar(30) NOT NULL,
+    Apellido1 varchar(30) NOT NULL,
+    Apellido2 varchar(30) NULL,
+    CONSTRAINT FK_CodCategoria_CATPROFESIONAL
+    FOREIGN KEY(Cod_categoria) REFERENCES T_CAT_PROFESIONAL(Cod_categoria)
+);
+
+create table T_TELEFONO_PERSONAL(
+    Id_trabajador int,
+    Telefono varchar(10),
+    PRIMARY KEY(Id_trabajador, Telefono),
+    CONSTRAINT FK_Idtrabajador_PERSONAL
+    FOREIGN KEY(Id_trabajador) REFERENCES T_PERSONAL(Id_trabajador)
+);
+
+create table T_AVION(
+    Matricula varchar(7) PRIMARY KEY,
+    Fabricante varchar(20) NOT NULL,
+    Modelo varchar(15) NOT NULL,
+    Capacidad int NOT NULL,
+    Autonomia int NOT NULL
+);
+
+create table T_VUELO(
+	Id_vuelo int NOT NULL PRIMARY KEY,
+	Matricula varchar(7),
+	Origen varchar(30) NOT NULL,
+	Destino varchar(30) NOT NULL,
+	Fecha DATETIME NOT NULL,
+	CONSTRAINT FK_Matricula_AVION
+	FOREIGN KEY(Matricula) REFERENCES T_AVION(Matricula)
+);
+
+create table T_PUESTO(
+	Id_trabajador int,
+	Id_vuelo int,
+	Puesto varchar(30) NOT NULL,
+	PRIMARY KEY(Id_trabajador, Id_vuelo),
+	CONSTRAINT FK_IdtrabajadorPuesto_PERSONAL
+	FOREIGN KEY (Id_trabajador) REFERENCES T_PERSONAL(Id_trabajador),
+	CONSTRAINT FK_IdvueloPuesto_VUELO
+	FOREIGN KEY (Id_vuelo) REFERENCES T_VUELO(Id_vuelo)
+);
+
+create table T_PASAJERO(
+	DNI_pasajero char(9) PRIMARY KEY,
+	Nombre varchar(30) NOT NULL,
+	Apellidos varchar(30) NOT NULL,
+	Email varchar(50) NOT NULL
+);
+
+create table T_DISTRIBUCION(
+	DNI_pasajero char(9),
+	Id_vuelo int,
+	Asiento int NOT NULL,
+	Clase ENUM('Turista', 'Business') NOT NULL,
+	PRIMARY KEY(DNI_pasajero, Id_vuelo),
+	CONSTRAINT FK_DNIpasajero_PASAJERO
+	FOREIGN KEY(DNI_pasajero) REFERENCES T_PASAJERO(DNI_pasajero),
+	CONSTRAINT FK_Idvuelo_VUELO
+	FOREIGN KEY(Id_vuelo) REFERENCES T_VUELO(Id_vuelo)
+);
+
+create table T_TELEFONO_PASAJERO(
+	Telefono_pasajero varchar(12),
+	DNI_pasajero char(9),
+	PRIMARY KEY(DNI_pasajero, Telefono_pasajero),
+	CONSTRAINT FK_DNIpasajerotelefono_PASAJERO
+	FOREIGN KEY(DNI_pasajero) REFERENCES T_PASAJERO(DNI_pasajero)
+);
